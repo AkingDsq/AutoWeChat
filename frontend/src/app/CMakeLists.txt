@@ -1,4 +1,4 @@
-project(appEMS)
+project(WeChatClient)
 
 # 定义可执行文件
 qt_add_executable(${PROJECT_NAME}
@@ -12,18 +12,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     ../../resources/resources.qrc
 )
 
-# qt_add_qml_module(${PROJECT_NAME}
-#     URI "appEMS"
-#     VERSION 1.0
-#     QML_FILES
-#         Main.qml
-#     OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/appEMS
-# )
-
-# 自动导入构建树里的插件
-# qt_import_qml_plugins(${PROJECT_NAME})
-
-# 如果需要，设置头文件搜索路径
+# 设置头文件搜索路径
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
@@ -32,9 +21,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Quick
     Qt6::Qml
-    ems_qmlplugin
-    domain
-    infrastructure
+    wechat_qml
+    wechat_domain
+    wechat_client_infra
 )
 
 # 安装可执行文件到 bin
@@ -57,7 +46,7 @@ install(CODE "
 ")
 
 # 构建后运行 windeployqt，将 Qt DLL 复制到可执行文件所在目录
-add_custom_command(TARGET appEMS POST_BUILD
-    COMMAND ${WINDEPLOYQT} "$<TARGET_FILE:appEMS>" --qmldir "${CMAKE_SOURCE_DIR}"
+add_custom_command(TARGET WeChatClient POST_BUILD
+    COMMAND ${WINDEPLOYQT} "$<TARGET_FILE:WeChatClient>" --qmldir "${CMAKE_SOURCE_DIR}"
     COMMENT "Running windeployqt to copy Qt6 DLLs to build directory"
 )

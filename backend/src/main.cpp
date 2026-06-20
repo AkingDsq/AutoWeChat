@@ -1,39 +1,19 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QQuickWindow>
+#include <QCoreApplication>
+#include <QDebug>
 
-#include "logging/LogApi.h"
-#include "viewModel/ApplicationControllorViewModel.h"
-
-// #include <QtQml/QQmlExtensionPlugin>
-// Q_IMPORT_QML_PLUGIN(ems_qmlPlugin)
+// backend 服务端入口 —— headless 进程，后续集成 gRPC Server
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
-    app.setApplicationName("AutoWeChat");
+    QCoreApplication app(argc, argv);
+    app.setApplicationName("WeChatServer");
     app.setOrganizationName("AKingDsq");
 
-    ApplicationControllorViewModel *appControllor = new ApplicationControllorViewModel(&app);
+    qInfo() << "WeChat Server starting on port 50051...";
 
-    QQmlApplicationEngine engine;
-
-    engine.rootContext()->setContextProperty("App", appControllor);
-
-    QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []()
-        { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
-    engine.loadFromModule("ems_qml", "Main");
-
-    if (engine.rootObjects().isEmpty())
-    {
-        return -1;
-    }
+    // TODO: 集成 gRPC Server
+    // WeChatGrpcServer server("0.0.0.0", 50051);
+    // server.start();
 
     return app.exec();
 }

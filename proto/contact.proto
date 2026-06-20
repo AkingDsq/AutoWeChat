@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package wechat;
+
+import "common.proto";
+
+// 联系人服务
+service ContactService {
+  rpc GetContacts(GetContactsRequest) returns (GetContactsResponse);
+  rpc AddContact(AddContactRequest) returns (AddContactResponse);
+  rpc DeleteContact(DeleteContactRequest) returns (DeleteContactResponse);
+  rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse);
+}
+
+message GetContactsRequest {
+  string token = 1;
+}
+
+message GetContactsResponse {
+  bool success = 1;
+  repeated User contacts = 2;
+}
+
+message AddContactRequest {
+  string token = 1;
+  string contact_user_id = 2;
+  string remark = 3;
+}
+
+message AddContactResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message DeleteContactRequest {
+  string token = 1;
+  string contact_user_id = 2;
+}
+
+message DeleteContactResponse {
+  bool success = 1;
+}
+
+message SearchUsersRequest {
+  string token = 1;
+  string keyword = 2;
+  int32 limit = 3;
+}
+
+message SearchUsersResponse {
+  bool success = 1;
+  repeated User users = 2;
+}

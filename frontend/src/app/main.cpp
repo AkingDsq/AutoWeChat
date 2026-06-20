@@ -7,7 +7,7 @@
 #include "viewModel/ApplicationControllorViewModel.h"
 
 // #include <QtQml/QQmlExtensionPlugin>
-// Q_IMPORT_QML_PLUGIN(ems_qmlPlugin)
+// Q_IMPORT_QML_PLUGIN(wechat_qmlPlugin)
 
 int main(int argc, char *argv[])
 {
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         []()
         { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("ems_qml", "Main");
+    engine.loadFromModule("WeChatClient", "Main");
 
     if (engine.rootObjects().isEmpty())
     {

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package wechat;
+
+import "common.proto";
+
+// 聊天服务
+service ChatService {
+  // 一元调用：发送消息
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+
+  // 双向流：实时消息推送（长连接，心跳保活）
+  rpc StreamMessages(stream StreamMessageRequest) returns (stream StreamMessageResponse);
+
+  // 一元调用：获取历史消息
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+}
+
+message SendMessageRequest {
+  string token = 1;
+  string receiver_id = 2;
+  string content = 3;
+  int32 message_type = 4;
+}
+
+message SendMessageResponse {
+  bool success = 1;
+  string message_id = 2;
+  int64 server_timestamp_ms = 3;
+  string error_message = 4;
+}
+
+message StreamMessageRequest {
+  string token = 1;
+}
+
+message StreamMessageResponse {
+  oneof payload {
+    TextMessage new_message = 1;       // 推送：新消息
+    int32 heartbeat_ack = 2;           // 心跳响应
+    string user_status_change = 3;     // 用户在线状态变化 "userId:online/offline"
+  }
+}
+
+message GetHistoryRequest {
+  string token = 1;
+  string peer_user_id = 2;
+  int64 before_timestamp_ms = 3;
+  int32 limit = 4;
+}
+
+message GetHistoryResponse {
+  repeated TextMessage messages = 1;
+  bool has_more = 2;
+}

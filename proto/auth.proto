@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package wechat;
+
+import "common.proto";
+
+// 认证服务
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+}
+
+message LoginRequest {
+  string username = 1;
+  string password_hash = 2;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string token = 2;
+  string error_message = 3;
+  User user = 4;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string nickname = 2;
+  string password_hash = 3;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string token = 2;
+  string error_message = 3;
+  User user = 4;
+}
+
+message LogoutRequest {
+  string token = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
+}
+
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool valid = 1;
+  string user_id = 2;
+}
