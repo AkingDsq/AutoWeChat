@@ -10,7 +10,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Quick Qml Core Gui)
+find_package(Qt6 REQUIRED COMPONENTS Quick Qml Core Gui)
 
 # 设置 windeployqt 路径（Windows平台专用）
 if(WIN32)
