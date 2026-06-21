@@ -82,3 +82,4 @@ CMakeLists.txt.user*
 /build*/
 /frontend/build/
 /backend/build/
+/third_party/

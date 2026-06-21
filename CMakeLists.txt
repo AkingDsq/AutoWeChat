@@ -21,8 +21,8 @@ option(BUILD_TESTS "构建测试" OFF)
 # 共享库（日志等）
 add_subdirectory(shared)
 
-# proto/ 暂不参与编译，待 gRPC/protobuf 手动集成后启用
-# add_subdirectory(proto)
+# proto
+add_subdirectory(proto)
 
 # 前端 Qt QML GUI 客户端
 if(BUILD_FRONTEND)
