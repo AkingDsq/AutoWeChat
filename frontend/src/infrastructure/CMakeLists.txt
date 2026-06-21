@@ -12,4 +12,5 @@ target_link_libraries(wechat_client_infra PUBLIC
     Qt6::Quick
     Qt6::Qml
     wechat_shared_logging
+    wechat_proto
 )

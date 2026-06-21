@@ -12,4 +12,5 @@ target_link_libraries(wechat_services PUBLIC
     Qt6::Core
     wechat_server_domain
     wechat_server_infra
+    wechat_proto
 )

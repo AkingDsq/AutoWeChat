@@ -1,13 +1,16 @@
 # 系统架构
 
-> 文档版本: v1.0 | 最后更新: 2026-06-20
+> 文档版本: v1.1 | 最后更新: 2026-06-21
 >
 > 相关文档导航:
 > - [文档索引](index.md) — 项目概述、技术栈
-> - [目录结构](directory-structure.md) — 项目目录与模块职责
+> - [需求分析](requirements-analysis.md) — 功能需求、用例图
+> - [前端设计](frontend-design.md) — 组件树、MVVM 交互
+> - [后端设计](backend-design.md) — ER图、Service接口
 > - [Proto 服务设计](proto-design.md) — gRPC 服务定义
 > - [gRPC 集成方案](grpc-integration.md) — 客户端/服务端实现
-> - [构建指南](build-guide.md) — 编译步骤
+> - [测试指南](testing-guide.md) — 测试策略、覆盖矩阵
+> - [环境配置](environment-setup.md) — IDE、构建命令
 
 ---
 
@@ -171,6 +174,8 @@ flowchart LR
 
 ## 五、gRPC 通信模式
 
+> gRPC 1.78.1 静态库已通过 `third_party/grpc1.78.1/` 集成，proto/CMakeLists.txt 自动生成 `.pb.h/.pb.cc` 和 `.grpc.pb.h/.grpc.pb.cc`。
+
 | 模式 | RPC 方法 | 用途 |
 |------|---------|------|
 | 一元调用 (Unary) | `Login`, `Register`, `SendMessage`, `GetContacts` | 请求-响应式操作 |
@@ -187,3 +192,160 @@ flowchart LR
 | 数据库 | SQLite | 零配置，单文件，适合学习项目 |
 | 构建系统 | CMake 3.21+ | Qt6 官方推荐，跨平台 |
 | 依赖管理 | 手动集成第三方 | 学习依赖构建流程，避免 vcpkg 黑盒 |
+
+---
+
+## 七、项目目录结构与模块职责
+
+> 本节内容原为独立的目录结构文档，已合并于此。
+
+### 7.1 项目根目录
+
+```
+AutoWeChat/
+  CMakeLists.txt              # 根 CMake 构建入口，project(AutoWeChat)
+  CMakePresets.json           # 构建预设 (MSVC 2022 Debug/Release)
+  .clang-format               # 代码格式化配置
+  .gitignore / .gitattributes  # Git 配置
+  README.md
+  .vscode/settings.json       # VS Code CMake 源目录配置
+```
+
+| 文件 | 职责 |
+|------|------|
+| `CMakeLists.txt` | 根构建文件，设置 C++17，gRPC 路径，添加 shared / proto / frontend / backend 子项目 |
+| `CMakePresets.json` | CMake 预设：MSVC 2022 x64 Debug/Release，Qt 路径 `E:/Qt/6.10.0/msvc2022_64` |
+
+### 7.2 shared/ —— 共享库
+
+```
+shared/
+  CMakeLists.txt              # add_library(wechat_shared_logging STATIC)
+  logging/
+    LogApi.h/cpp              # 全局日志 API（线程安全，QMutex + shared_ptr）
+    LoggerService.h/cpp       # 日志服务（QObject，2000条缓冲 + 2MB文件轮转）
+```
+
+**职责**：存放 frontend 和 backend 共用的代码。当前仅包含线程安全的日志库。
+
+### 7.3 proto/ —— Protocol Buffers 定义（已启用编译）
+
+```
+proto/
+  CMakeLists.txt              # find_package(gRPC/protobuf) + 代码生成 + wechat_proto 库
+  common.proto                # User, TextMessage 基础类型
+  auth.proto                  # AuthService: Login, Register, Logout, ValidateToken
+  chat.proto                  # ChatService: SendMessage, StreamMessages, GetHistory
+  contact.proto               # ContactService: GetContacts, AddContact, DeleteContact, SearchUsers
+```
+
+**职责**：定义前后端通信的 gRPC 服务契约。CMake 配置自动生成 C++ 代码（`.pb.h/.pb.cc` + `.grpc.pb.h/.grpc.pb.cc`），打包为 `wechat_proto` 静态库供前后端链接。
+
+### 7.4 frontend/ —— Qt QML GUI 客户端
+
+```
+frontend/
+  CMakeLists.txt              # find_package Qt6 Quick Qml Gui，windeployqt 设置
+  resources/resources.qrc     # Qt 资源文件
+  src/
+    CMakeLists.txt            # add_subdirectory: qml, infra, domain, app
+    qml/
+      CMakeLists.txt          # qt_add_qml_module "WeChatClient"，STATIC 库
+      Main.qml                # 主窗口 ApplicationWindow (960x540)
+      views/                  # 页面 QML（📋 待实现）
+      components/             # 可复用 QML 组件（📋 待实现）
+    app/
+      CMakeLists.txt          # project(WeChatClient)，qt_add_executable
+      main.cpp                # QGuiApplication 入口，加载 QML 模块
+      viewmodel/
+        ApplicationControllerViewModel.h/.cpp  # 根 ViewModel ✅
+        LogViewModel.h/.cpp                   # 日志 ViewModel ✅
+    domain/
+      CMakeLists.txt          # add_library(wechat_domain STATIC)
+      model/
+        User.h                # 用户数据结构
+        Message.h             # 文本消息数据结构
+    infrastructure/
+      CMakeLists.txt          # add_library(wechat_client_infra STATIC)
+      grpc/                   # gRPC 客户端实现（📋 待实现）
+      storage/                # 本地 SQLite 缓存（📋 待实现）
+  tests/
+    CMakeLists.txt            # WeChatClientTests 脚手架
+```
+
+| 层 | 编译目标 | 链接依赖 |
+|----|---------|---------|
+| QML | `wechat_qml` | Qt6::Quick, Qt6::Qml |
+| App | `WeChatClient.exe` | wechat_qml, wechat_domain, wechat_client_infra, Qt6::Quick |
+| Domain | `wechat_domain` | wechat_client_infra, Qt6::Core |
+| Infrastructure | `wechat_client_infra` | wechat_shared_logging, wechat_proto, Qt6::Core, Qt6::Quick |
+
+### 7.5 backend/ —— headless gRPC 服务端
+
+```
+backend/
+  CMakeLists.txt              # find_package Qt6 Core Sql（无 GUI 依赖）
+  src/
+    CMakeLists.txt            # project(WeChatServer)，add_executable
+    main.cpp                  # QCoreApplication 入口，待集成 gRPC Server
+    service/
+      CMakeLists.txt          # add_library(wechat_services STATIC)
+      AuthServiceImpl.h/.cpp  # 认证服务骨架
+    domain/
+      CMakeLists.txt          # add_library(wechat_server_domain STATIC)
+      model/User.h            # 服务端用户模型
+    infrastructure/
+      CMakeLists.txt          # add_library(wechat_server_infra STATIC)
+      database/               # 数据库层（📋 待实现）
+  tests/
+    CMakeLists.txt            # WeChatServerTests 脚手架
+```
+
+| 层 | 编译目标 | 链接依赖 |
+|----|---------|---------|
+| App | `WeChatServer.exe` | wechat_services, wechat_server_domain, wechat_server_infra |
+| Service | `wechat_services` | wechat_server_domain, wechat_server_infra, wechat_proto |
+| Domain | `wechat_server_domain` | wechat_server_infra, Qt6::Core |
+| Infrastructure | `wechat_server_infra` | wechat_shared_logging, Qt6::Core, Qt6::Sql |
+
+### 7.6 tests/ + docs/
+
+```
+tests/
+  CMakeLists.txt              # 根级测试入口（BUILD_TESTS=ON 激活）
+  frontend/tests/             # WeChatClientTests
+  backend/tests/              # WeChatServerTests
+
+docs/
+  index.md                    # 文档索引（导航 + 依赖关系图）
+  requirements-analysis.md    # 需求分析（功能需求、用例图、RTM）
+  system-architecture.md      # 本文档
+  frontend-design.md          # 前端设计
+  backend-design.md           # 后端设计
+  proto-design.md             # Proto 服务定义
+  grpc-integration.md         # gRPC 集成方案
+  environment-setup.md        # 环境配置 + 构建指南
+  testing-guide.md            # 测试指南
+```
+
+### 7.7 CMake 构建目标依赖
+
+```mermaid
+graph TD
+    CLIENT["WeChatClient.exe"] --> WQML["wechat_qml (QML)"]
+    CLIENT --> WDOMAIN["wechat_domain"]
+    CLIENT --> WCINFRA["wechat_client_infra"]
+    WDOMAIN --> WCINFRA
+    WCINFRA --> SHARED["wechat_shared_logging"]
+    WCINFRA --> PROTO_LIB["wechat_proto"]
+
+    SERVER["WeChatServer.exe"] --> WSVC["wechat_services"]
+    SERVER --> WSDOMAIN["wechat_server_domain"]
+    SERVER --> WSINFRA["wechat_server_infra"]
+    WSVC --> WSDOMAIN
+    WSDOMAIN --> WSINFRA
+    WSINFRA --> SHARED
+    WSVC --> PROTO_LIB
+```
+
+**图7 CMake 目标依赖图**：该图展示了所有 CMake 目标的依赖关系。`wechat_shared_logging` 是两端共享的日志库。`wechat_proto` 同时被前端 `wechat_client_infra` 和后端 `wechat_services` 链接，提供 gRPC 消息类型和服务桩代码。

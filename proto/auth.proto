@@ -4,7 +4,6 @@ package wechat;
 
 import "common.proto";
 
-// 认证服务
 service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc Register(RegisterRequest) returns (RegisterResponse);

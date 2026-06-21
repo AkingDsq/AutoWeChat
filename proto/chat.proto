@@ -4,15 +4,9 @@ package wechat;
 
 import "common.proto";
 
-// 聊天服务
 service ChatService {
-  // 一元调用：发送消息
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
-
-  // 双向流：实时消息推送（长连接，心跳保活）
   rpc StreamMessages(stream StreamMessageRequest) returns (stream StreamMessageResponse);
-
-  // 一元调用：获取历史消息
   rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
 }
 

@@ -4,7 +4,6 @@ package wechat;
 
 import "common.proto";
 
-// 联系人服务
 service ContactService {
   rpc GetContacts(GetContactsRequest) returns (GetContactsResponse);
   rpc AddContact(AddContactRequest) returns (AddContactResponse);

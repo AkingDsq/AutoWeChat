@@ -2,21 +2,19 @@ syntax = "proto3";
 
 package wechat;
 
-// 用户
 message User {
   string user_id = 1;
   string username = 2;
   string nickname = 3;
   string avatar_url = 4;
-  int32 status = 5;       // 0=offline, 1=online, 2=away
+  int32 status = 5;
 }
 
-// 文本消息
 message TextMessage {
   string message_id = 1;
   string sender_id = 2;
   string receiver_id = 3;
   string content = 4;
   int64 timestamp_ms = 5;
-  int32 message_type = 6;  // 0=text, 1=image, 2=file
+  int32 message_type = 6;
 }

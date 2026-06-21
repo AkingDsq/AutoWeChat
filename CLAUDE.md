@@ -21,7 +21,7 @@
 |---|------|------|
 | 前端 UI | Qt QML (Quick Controls) | 6.10.0 |
 | 前端逻辑 | C++ ViewModel (MVVM) | C++17 |
-| 通信 | gRPC + Protobuf | 待集成 |
+| 通信 | gRPC + Protobuf | 1.78.1 (third_party 预编译) |
 | 后端 | Qt QCoreApplication (headless) | 6.10.0 |
 | 数据库 | SQLite (Phase 1) | via QSqlDatabase |
 | 构建 | CMake | 3.21+ |
@@ -35,7 +35,7 @@ AutoWeChat/
   CMakePresets.json           # 构建预设 (MSVC 2022 Debug/Release)
   shared/                     # 前后端共享代码
     logging/                  # 线程安全日志库 (wechat_shared_logging)
-  proto/                      # .proto 定义 (暂不参与编译)
+  proto/                      # .proto 定义 + wechat_proto 静态库
   frontend/                   # Qt6 QML GUI 客户端
     src/
       qml/                    # QML 界面代码
@@ -76,13 +76,19 @@ AutoWeChat/
 - 新增 Infrastructure 代码：更新对应 infrastructure/CMakeLists.txt
 - 新增 ViewModel：更新 frontend/src/app/CMakeLists.txt
 - 新增 Service：更新 backend/src/service/CMakeLists.txt
+- 新增 .proto 文件：更新 proto/CMakeLists.txt 中的 PROTO_FILES 列表
 - 新增文件后必须在对应的CMakeLists.txt中添加声明
 
 ## 构建与测试命令（Windows + MSVC 2022）
 
 ```bash
+# windeployqt6 需要在构建前运行一次，以确保 Qt 相关的 DLL 和插件被正确复制到构建目录
+
 # Debug 配置
 cmake --preset windows-msvc2022-debug
+
+# 构建 proto 库（验证 gRPC 集成，生成 .pb.h/.pb.cc 和 .grpc.pb.h/.grpc.pb.cc）
+cmake --build build/windows-msvc2022-debug --config Debug --target wechat_proto --parallel
 
 # 构建前端
 cmake --build build/windows-msvc2022-debug --config Debug --target WeChatClient --parallel
@@ -93,9 +99,13 @@ cmake --build build/windows-msvc2022-debug --config Debug --target WeChatServer 
 # 构建全部
 cmake --build build/windows-msvc2022-debug --config Debug --parallel
 
-# 开启测试
+# 开启测试并配置
 cmake --preset windows-msvc2022-debug -DBUILD_TESTS=ON
-cmake --build build/windows-msvc2022-debug --config Debug --parallel
+
+# 构建全部测试聚合目标
+cmake --build build/windows-msvc2022-debug --config Debug --target all_tests --parallel
+
+# 运行测试
 ctest --test-dir build/windows-msvc2022-debug -C Debug --output-on-failure
 ```
 
@@ -119,3 +129,18 @@ ctest --test-dir build/windows-msvc2022-debug -C Debug --output-on-failure
 - 前端：Qt 主线程 (QML/UI) + gRPC CompletionQueue 线程 + QThreadPool
 - 后端：QCoreApplication 主线程 + gRPC 内部线程 + QThreadPool
 - 跨线程安全：QMetaObject::invokeMethod + Qt::QueuedConnection
+
+### gRPC 第三方库
+
+- gRPC 1.78.1 预编译静态库位于 `third_party/grpc1.78.1/`（Debug + Release 双版本）
+- cmake 包配置路径：`lib/cmake/grpc/`、`lib/cmake/protobuf/`
+- `find_package(protobuf CONFIG)` 和 `find_package(gRPC CONFIG)` 自动发现
+- 可用 cmake target：`gRPC::grpc++`、`protobuf::libprotobuf`、`gRPC::grpc_cpp_plugin`、`protobuf::protoc`
+- `third_party/` 由 `.gitignore` 忽略，需单独获取
+
+### gRPC 编码约束
+
+- gRPC Service 实现类必须继承生成的 `Service::Service` 基类
+- gRPC 客户端调用必须在专用线程（GrpcClientThread）执行，不得阻塞 Qt 主线程
+- 跨线程回调必须使用 `QMetaObject::invokeMethod(receiver, func, Qt::QueuedConnection)`
+- proto 文件中的注释会被 protoc 带入生成的 C++ 代码，MSVC 需要 `/utf-8` 编译选项（根 CMakeLists.txt 已配置）

@@ -1,17 +1,22 @@
 # Proto 服务设计
 
-> 文档版本: v1.0 | 最后更新: 2026-06-20
+> 文档版本: v1.1 | 最后更新: 2026-06-21
 >
 > 相关文档导航:
-> - [系统架构](system-architecture.md) — 架构概览、线程模型
+> - [文档索引](index.md) — 项目概述、文档依赖关系
+> - [需求分析](requirements-analysis.md) — 功能需求、用例图
+> - [系统架构](system-architecture.md) — 分层设计、线程模型
+> - [后端设计](backend-design.md) — ER图、Service接口
 > - [gRPC 集成方案](grpc-integration.md) — 客户端/服务端实现
-> - [目录结构](directory-structure.md) — 文件位置
+> - [环境配置](environment-setup.md) — IDE、构建命令
 
 ---
 
 ## 一、服务总览
 
 AutoWeChat 定义了 4 个 gRPC 服务，覆盖微信核心功能的通信契约。
+
+> gRPC 桩代码已通过 `proto/CMakeLists.txt` 自动生成（`protoc` + `grpc_cpp_plugin`），生成的 `.pb.h/.pb.cc` 和 `.grpc.pb.h/.grpc.pb.cc` 打包为 `wechat_proto` 静态库。
 
 | 服务 | Proto 文件 | RPC 方法 | 通信模式 | Phase |
 |------|-----------|---------|---------|-------|
