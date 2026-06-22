@@ -2,6 +2,8 @@ find_package(Qt6 REQUIRED COMPONENTS Quick)
 
 set(qmlFiles
     Main.qml
+    dialogs/LoginDialog.qml
+    dialogs/MainDialog.qml
 )
 
 qt_add_library(wechat_qml STATIC)
