@@ -10,7 +10,7 @@ qt_add_qml_module(wechat_qml
     VERSION 1.0
     QML_FILES
         ${qmlFiles}
-    OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/WeChatClient"
+    OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/wechat_qml"
 )
 target_link_libraries(wechat_qml PRIVATE
     Qt6::Quick

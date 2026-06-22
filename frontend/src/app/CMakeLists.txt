@@ -15,13 +15,12 @@ target_sources(${PROJECT_NAME} PRIVATE
 # 设置头文件搜索路径
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Quick
     Qt6::Qml
-    wechat_qml
+    wechat_qmlplugin
     wechat_domain
     wechat_client_infra
 )
