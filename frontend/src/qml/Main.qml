@@ -5,7 +5,7 @@ import WeChatClient 1.0
 
 ApplicationWindow {
     id: window
-    width: 960
+    width: 400
     height: 540
     visible: true
     title: qsTr("AutoWeChat")

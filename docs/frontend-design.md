@@ -45,7 +45,7 @@ graph TD
 
     APP --> STACK["StackView<br/>页面导航栈"]
 
-    STACK --> LOGIN["LoginPage<br/>登录/注册 ✅ 已实现: 骨架"]
+    STACK --> LOGIN["LoginPage<br/>登录/注册 ✅ 已实现: 微信风格UI"]
     STACK --> MAIN["MainPage 📋 设计意图"]
 
     MAIN --> CONTACT_LIST["ContactListPage<br/>联系人列表 📋"]
@@ -57,7 +57,7 @@ graph TD
     CONTACT_LIST --> CONTACT_ITEM["ContactItem<br/>联系人条目 📋"]
 ```
 
-**图1 前端 UI 组件树**：该图展示了 QML 应用的整体组件层次。`ApplicationWindow` 为根节点，`StackView` 管理页面导航。当前 Phase 0 仅实现 Main.qml 骨架窗口。LoginPage、MainPage 等页面为设计意图，待 Phase 1 实现。
+**图1 前端 UI 组件树**：该图展示了 QML 应用的整体组件层次。`ApplicationWindow` 为根节点，`StackView` 管理页面导航。当前 Phase 0 已实现 Main.qml 主窗口和 LoginPage 微信风格 UI。MainPage、ChatPage 等页面待 Phase 1 实现。
 
 ## 三、路由设计
 
@@ -199,7 +199,8 @@ add_custom_command(TARGET WeChatClient POST_BUILD
 | ApplicationControllerViewModel | ✅ 已实现 | 根 ViewModel，暴露 LogViewModel |
 | LogViewModel | ✅ 已实现 | Q_PROPERTY allLogs，Q_INVOKABLE clearLogs |
 | wechat_qml (QML Module) | ✅ 已实现 | URI "WeChatClient"，STATIC LIB |
-| LoginPage / LoginViewModel | 📋 设计意图 | Phase 1 实现 |
+| LoginPage (UI) | ✅ 已实现 | 微信风格登录界面，头像+输入框+密码切换+登录按钮 |
+| LoginViewModel | 📋 设计意图 | Phase 1 实现（gRPC 登录逻辑） |
 | ChatPage / ChatListViewModel | 📋 设计意图 | Phase 1 实现 |
 | ContactListPage / ContactViewModel | 📋 设计意图 | Phase 1 实现 |
 | GrpcClientThread | 📋 设计意图 | Phase 1 实现，详见 [gRPC 集成方案](grpc-integration.md) |
