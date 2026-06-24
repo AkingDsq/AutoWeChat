@@ -114,7 +114,8 @@ Item {
                         anchors.leftMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
                         source: "qrc:/ui/contact_list.png"
-                        width: 16; height: 16
+                        width: 16
+                        height: 16
                     }
 
                     // 用户名输入框
@@ -137,7 +138,9 @@ Item {
                 }
 
                 // 字段间距
-                Item { Layout.preferredHeight: 16 }
+                Item {
+                    Layout.preferredHeight: 16
+                }
 
                 // ---- 密码输入区域 ----
                 Rectangle {
@@ -175,26 +178,24 @@ Item {
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
-                        source: passwordField.echoMode === TextInput.Password
-                                ? "qrc:/ui/unvisible.png"
-                                : "qrc:/ui/visible.png"
-                        width: 18; height: 18
+                        source: passwordField.echoMode === TextInput.Password ? "qrc:/ui/unvisible.png" : "qrc:/ui/visible.png"
+                        width: 18
+                        height: 18
 
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                passwordField.echoMode =
-                                    passwordField.echoMode === TextInput.Password
-                                    ? TextInput.Normal
-                                    : TextInput.Password;
+                                passwordField.echoMode = passwordField.echoMode === TextInput.Password ? TextInput.Normal : TextInput.Password;
                             }
                         }
                     }
                 }
 
                 // 按钮间距
-                Item { Layout.preferredHeight: 24 }
+                Item {
+                    Layout.preferredHeight: 24
+                }
 
                 // ---- 登录按钮 ----
                 Button {
@@ -210,8 +211,7 @@ Item {
                     // 微信绿背景
                     background: Rectangle {
                         radius: w.radius
-                        color: loginButton.pressed ? w.greenDark
-                             : (loginButton.hovered ? w.greenHover : w.green)
+                        color: loginButton.pressed ? w.greenDark : (loginButton.hovered ? w.greenHover : w.green)
                     }
 
                     // 白色文字
@@ -246,7 +246,9 @@ Item {
                 }
 
                 // 选项间距
-                Item { Layout.preferredHeight: 16 }
+                Item {
+                    Layout.preferredHeight: 16
+                }
 
                 // ---- 选项行：自动登录 / 记住密码 ----
                 RowLayout {
@@ -260,7 +262,8 @@ Item {
                         font.pixelSize: w.fontSizeSmall
 
                         indicator: Rectangle {
-                            implicitWidth: 16; implicitHeight: 16
+                            implicitWidth: 16
+                            implicitHeight: 16
                             x: autoLoginBox.leftPadding
                             y: parent.height / 2 - height / 2
                             radius: 2
@@ -284,7 +287,8 @@ Item {
                         font.pixelSize: w.fontSizeSmall
 
                         indicator: Rectangle {
-                            implicitWidth: 16; implicitHeight: 16
+                            implicitWidth: 16
+                            implicitHeight: 16
                             x: rememberBox.leftPadding
                             y: parent.height / 2 - height / 2
                             radius: 2
@@ -304,7 +308,10 @@ Item {
                 }
 
                 // ---- 弹性填充 + 注册链接 ----
-                Item { Layout.fillHeight: true; Layout.preferredHeight: 20 }
+                Item {
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: 20
+                }
 
                 Text {
                     text: qsTr("Register Account")
@@ -316,9 +323,9 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            // TODO: 切换到注册页面 (Phase 1)
-                        }
+                        onClicked:
+                        // TODO: 切换到注册页面 (Phase 1)
+                        {}
                     }
                 }
             }
@@ -331,8 +338,7 @@ Item {
         id: resetUsernameBorder
         interval: 2000
         onTriggered: {
-            usernameWrapper.border.color =
-                usernameField.activeFocus ? w.borderFocus : w.border;
+            usernameWrapper.border.color = usernameField.activeFocus ? w.borderFocus : w.border;
         }
     }
 
@@ -340,8 +346,7 @@ Item {
         id: resetPasswordBorder
         interval: 2000
         onTriggered: {
-            passwordWrapper.border.color =
-                passwordField.activeFocus ? w.borderFocus : w.border;
+            passwordWrapper.border.color = passwordField.activeFocus ? w.borderFocus : w.border;
         }
     }
 }
