@@ -13,7 +13,7 @@
 - 主要架构：MVVM + 分层架构 + 前后端分离
 - 依赖方向（前端）：QML → app/viewModel → domain/model → infrastructure
 - 依赖方向（后端）：main.cpp → service → domain/model → infrastructure
-- 通信协议：gRPC + Protocol Buffers
+- 通信协议：gRPC + Protocol Buffers 
 
 ## 技术栈
 
